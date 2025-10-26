@@ -1,0 +1,24 @@
+# ==============================================
+# Dependencias para Proyecto Multicast
+# ==============================================
+
+# No se requieren librerías externas obligatorias
+# Todo funciona con la biblioteca estándar de Python 3
+
+# Opcional: Para colores en Windows
+colorama>=0.4.6
+
+# Opcional: Para mejor formato de logs
+python-dateutil>=2.8.2
+
+# Opcional: Para debugging mejorado
+# ipython>=8.12.0
+
+# ==============================================
+# Instalación:
+# pip install -r requirements.txt
+# 
+# O manualmente solo lo esencial:
+# pip install colorama
+# ==============================================
+
