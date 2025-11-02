@@ -1,0 +1,129 @@
+# INFORMACION DE MI CONFIGURACION ZEROTIER
+# =========================================
+
+## MI RED ZEROTIER
+
+Network ID: 68bea79acfc140f0
+Nombre de Red: multicast
+Rango IP: 192.168.194.0/24
+Admin de Red: [TU_NOMBRE]
+
+## MIS DISPOSITIVOS
+
+### LAPTOP (Principal)
+- Node ID: a4f67af1ab
+- IP Asignada: 192.168.194.33
+- NODE_NAME en config.py: Nodo_Juan  # <-- CAMBIA ESTO POR TU NOMBRE
+- Estado: ACTIVO
+
+### CELULAR (Solo para pruebas basicas)
+- Node ID: 346c0569c7
+- IP Asignada: 192.168.194.187
+- Estado: ACTIVO
+- Nota: No puede ejecutar Python, solo para ping
+
+## PARA COMPARTIR CON COMPANEROS
+
+Copia y pega este mensaje en el grupo:
+----------------------------------------
+
+🌐 RED ZEROTIER PARA PROYECTO MULTICAST
+
+NETWORK ID: 68bea79acfc140f0
+
+Para unirse:
+1. Instala ZeroTier: https://www.zerotier.com/download/
+2. Ejecuta: zerotier-cli join 68bea79acfc140f0
+3. Envia tu Node ID para autorización
+
+MI INFORMACION:
+- Nombre: [TU_NOMBRE_AQUI]
+- Node ID: a4f67af1ab
+- IP: 192.168.194.33
+- NODE_NAME: Nodo_Juan
+- Puerto: 5007
+
+CONFIGURACION MULTICAST:
+- Grupo: 224.1.1.1
+- Puerto: 5007
+- TTL: 2
+
+¿Cuando podemos hacer las pruebas?
+
+----------------------------------------
+
+## COMANDOS UTILES
+
+# Ver tu estado
+zerotier-cli info
+
+# Ver tu IP
+zerotier-cli listnetworks
+
+# Ver peers conectados
+zerotier-cli listpeers
+
+# Salir de la red (cuando termines el proyecto)
+zerotier-cli leave 68bea79acfc140f0
+
+## PRUEBAS BASICAS
+
+### Con tu celular (solo ping ICMP)
+Desde laptop:
+ping 192.168.194.187
+
+Deberias ver respuestas
+
+### Con companeros (multicast Python)
+python multicast_node.py
+# O para prueba rapida:
+python quick_zerotier_test.py
+
+## CHECKLIST ANTES DE PRUEBAS CON COMPANEROS
+
+[ ] ZeroTier muestra ONLINE
+[ ] IP asignada: 192.168.194.33
+[ ] config.py tiene LOCAL_IP = '192.168.194.33'
+[ ] NODE_NAME configurado con tu nombre
+[ ] Firewall desactivado o con excepcion para Python
+[ ] Puerto 5007 libre (no hay otro programa usandolo)
+[ ] Test local funciona: python quick_zerotier_test.py
+
+## MIEMBROS DEL EQUIPO (ACTUALIZAR)
+
+| Nombre | Node ID | IP ZeroTier | NODE_NAME | Autorizado |
+|--------|---------|-------------|-----------|------------|
+| TU | a4f67af1ab | 192.168.194.33 | Nodo_Juan | SI |
+| Companero1 | (pedir) | (pendiente) | (pedir) | NO |
+| Companero2 | (pedir) | (pendiente) | (pedir) | NO |
+| Companero3 | (pedir) | (pendiente) | (pedir) | NO |
+
+## COMO AUTORIZAR COMPANEROS (Tu eres el admin)
+
+1. Ve a https://my.zerotier.com
+2. Click en tu red: 68bea79acfc140f0
+3. Seccion "Members"
+4. Cuando aparezca un nuevo miembro:
+   - Marca el checkbox de "Auth?"
+   - Opcionalmente pon un nombre descriptivo
+5. El companero recibira su IP automaticamente
+
+## HORARIOS PROPUESTOS PARA PRUEBAS
+
+Fecha: [DEFINIR]
+Hora: [DEFINIR]
+Duracion estimada: 30-45 minutos
+
+Actividades:
+1. Todos se conectan (5 min)
+2. Prueba basica de mensajes (10 min)
+3. Ejecutar escenarios con coordinador (15 min)
+4. Capturar con Wireshark (10 min)
+5. Generar reportes (5 min)
+
+## NOTAS IMPORTANTES
+
+- Tu eres el ADMINISTRADOR de la red
+- Debes autorizar a cada companero que se una
+- Guarda el Network ID de forma segura
+- Despues del proyecto, pueden eliminar la red en ZeroTier Central

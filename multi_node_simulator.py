@@ -10,7 +10,9 @@ import os
 import sys
 import random
 import signal
+import argparse
 from config import *
+
 
 class MultiNodeSimulator:
     def __init__(self):
@@ -20,12 +22,12 @@ class MultiNodeSimulator:
         self.processes = []
         self.running = False
         self.node_configs = []
-        
+
     def create_node_config(self, node_id):
         """
         Crea una configuración temporal para un nodo
         """
-        config_content = f"""
+        config_content = f"""# -*- coding: utf-8 -*-
 # Configuración temporal para nodo simulado
 import socket
 import json
@@ -88,6 +90,10 @@ def log_message(message, direction='INFO'):
         pass
 
 def print_colored(message, color='WHITE'):
+    import sys
+    # Configurar stdout para UTF-8 en Windows
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
     if color in COLORS:
         print(f"{{COLORS[color]}}{{message}}{{COLORS['RESET']}}")
     else:
@@ -111,15 +117,15 @@ def get_system_info():
             'port': PORT
         }}
 """
-        
+
         # Guardar configuración temporal
         config_file = f"temp_config_{node_id}.py"
-        with open(config_file, 'w') as f:
+        with open(config_file, 'w', encoding='utf-8') as f:
             f.write(config_content)
-        
+
         self.node_configs.append(config_file)
         return config_file
-    
+
     def create_automated_node_script(self, node_id, behavior='normal'):
         """
         Crea un script de nodo automatizado con comportamiento específico
@@ -137,7 +143,7 @@ def get_system_info():
                 f"Saludos desde SimNode_{node_id}"
             ]
             interval = random.uniform(3, 8)
-            
+
         elif behavior == 'quiet':
             # Nodo que envía pocos mensajes
             messages = [
@@ -145,12 +151,12 @@ def get_system_info():
                 "Confirmando recepción"
             ]
             interval = random.uniform(15, 30)
-            
+
         elif behavior == 'ping':
             # Nodo que solo envía pings
             messages = []
             interval = 10
-            
+
         else:  # normal
             messages = [
                 f"Nodo {node_id} iniciado",
@@ -159,8 +165,8 @@ def get_system_info():
                 "Sistema operativo"
             ]
             interval = random.uniform(5, 15)
-        
-        script_content = f"""
+
+        script_content = f"""# -*- coding: utf-8 -*-
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -172,6 +178,31 @@ sys.modules['config'] = config
 from multicast_node import MulticastNode
 import time
 import random
+import json
+import os
+
+def save_node_stats(node):
+    # Guarda las estadísticas del nodo en un archivo
+    stats_dir = 'logs/node_stats'
+    if not os.path.exists(stats_dir):
+        os.makedirs(stats_dir)
+    
+    stats_file = os.path.join(stats_dir, 'node_' + node.node_name + '_stats.json')
+    stats_data = {{
+        'node_name': node.node_name,
+        'messages_sent': node.stats['messages_sent'],
+        'messages_received': node.stats['messages_received'],
+        'bytes_sent': node.stats['bytes_sent'],
+        'bytes_received': node.stats['bytes_received'],
+        'errors': node.stats['errors'],
+        'timestamp': time.time()
+    }}
+    
+    try:
+        with open(stats_file, 'w', encoding='utf-8') as f:
+            json.dump(stats_data, f, indent=2)
+    except:
+        pass
 
 def run_automated_node():
     node = MulticastNode("SimNode_{node_id}")
@@ -201,6 +232,7 @@ def run_automated_node():
     
     try:
         message_count = 0
+        stats_save_counter = 0
         while True:
             time.sleep({interval} + random.uniform(-2, 2))
             
@@ -214,10 +246,18 @@ def run_automated_node():
             # Ocasionalmente enviar ping
             if random.random() < 0.1:
                 node.send_message("Ping aleatorio", 'PING')
+            
+            # Guardar estadísticas cada 3 iteraciones
+            stats_save_counter += 1
+            if stats_save_counter >= 3:
+                save_node_stats(node)
+                stats_save_counter = 0
                 
     except KeyboardInterrupt:
         pass
     finally:
+        # Guardar estadísticas finales
+        save_node_stats(node)
         node.send_message("SimNode_{node_id} se desconecta", 'GOODBYE')
         node.running = False
         time.sleep(1)
@@ -225,13 +265,13 @@ def run_automated_node():
 if __name__ == "__main__":
     run_automated_node()
 """
-        
+
         script_file = f"temp_node_{node_id}.py"
-        with open(script_file, 'w') as f:
+        with open(script_file, 'w', encoding='utf-8') as f:
             f.write(script_content)
-        
+
         return script_file
-    
+
     def start_node(self, node_id, behavior='normal'):
         """
         Inicia un nodo simulado
@@ -239,52 +279,64 @@ if __name__ == "__main__":
         # Crear archivos temporales
         config_file = self.create_node_config(node_id)
         script_file = self.create_automated_node_script(node_id, behavior)
-        
+
         # Ejecutar el nodo en un proceso separado
         try:
-            if os.name == 'nt':  # Windows
-                process = subprocess.Popen(
-                    ['python', script_file],
-                    creationflags=subprocess.CREATE_NEW_CONSOLE
-                )
-            else:  # Linux/Mac
-                process = subprocess.Popen(
-                    ['python3', script_file],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
-                )
-            
+            # Usar sys.executable para asegurar el mismo intérprete de Python
+            python_exe = sys.executable
+
+            # Crear archivo de log para este nodo
+            log_file = f"logs/sim_node_{node_id}.log"
+
+            # Abrir archivos de log para stdout y stderr
+            stdout_file = open(log_file, 'w', encoding='utf-8')
+            stderr_file = open(
+                f"logs/sim_node_{node_id}_err.log", 'w', encoding='utf-8')
+
+            # Lanzar proceso en segundo plano (sin consola nueva)
+            process = subprocess.Popen(
+                [python_exe, script_file],
+                stdout=stdout_file,
+                stderr=stderr_file,
+                cwd=os.getcwd(),
+                # No usar CREATE_NEW_CONSOLE - ejecutar en segundo plano
+            )
+
             self.processes.append({
                 'id': node_id,
                 'process': process,
                 'config': config_file,
                 'script': script_file,
-                'behavior': behavior
+                'behavior': behavior,
+                'stdout_file': stdout_file,
+                'stderr_file': stderr_file
             })
-            
-            print_colored(f"✅ Nodo SimNode_{node_id} iniciado ({behavior})", 'GREEN')
+
+            print_colored(
+                f"✅ Nodo SimNode_{node_id} iniciado ({behavior})", 'GREEN')
             return True
-            
+
         except Exception as e:
             print_colored(f"❌ Error iniciando nodo {node_id}: {e}", 'RED')
             return False
-    
+
     def stop_all_nodes(self):
         """
         Detiene todos los nodos simulados
         """
         print_colored("\n⏹ Deteniendo todos los nodos...", 'YELLOW')
-        
+
         for node_info in self.processes:
             try:
                 node_info['process'].terminate()
-                print_colored(f"  • SimNode_{node_info['id']} detenido", 'YELLOW')
+                print_colored(
+                    f"  • SimNode_{node_info['id']} detenido", 'YELLOW')
             except:
                 pass
-        
+
         # Esperar un poco
         time.sleep(2)
-        
+
         # Forzar terminación si es necesario
         for node_info in self.processes:
             try:
@@ -292,35 +344,45 @@ if __name__ == "__main__":
                     node_info['process'].kill()
             except:
                 pass
-        
+
+        # Cerrar archivos de log
+        for node_info in self.processes:
+            try:
+                if 'stdout_file' in node_info:
+                    node_info['stdout_file'].close()
+                if 'stderr_file' in node_info:
+                    node_info['stderr_file'].close()
+            except:
+                pass
+
         # Limpiar archivos temporales
         self.cleanup_temp_files()
-    
+
     def cleanup_temp_files(self):
         """
         Elimina archivos temporales creados
         """
         print_colored("\n🧹 Limpiando archivos temporales...", 'YELLOW')
-        
+
         for node_info in self.processes:
             # Eliminar archivo de configuración
             try:
                 os.remove(node_info['config'])
             except:
                 pass
-            
+
             # Eliminar script
             try:
                 os.remove(node_info['script'])
             except:
                 pass
-            
+
             # Eliminar .pyc si existe
             try:
                 os.remove(node_info['config'] + 'c')
             except:
                 pass
-        
+
         # Limpiar archivos huérfanos
         for file in os.listdir('.'):
             if file.startswith('temp_config_') or file.startswith('temp_node_'):
@@ -328,14 +390,14 @@ if __name__ == "__main__":
                     os.remove(file)
                 except:
                     pass
-    
+
     def show_status(self):
         """
         Muestra el estado de los nodos simulados
         """
         print_colored("\n📊 ESTADO DE NODOS SIMULADOS", 'MAGENTA')
         print_colored("="*40, 'MAGENTA')
-        
+
         active = 0
         for node_info in self.processes:
             if node_info['process'].poll() is None:
@@ -343,17 +405,20 @@ if __name__ == "__main__":
                 active += 1
             else:
                 status = "🔴 Detenido"
-            
-            print_colored(f"SimNode_{node_info['id']}: {status} ({node_info['behavior']})", 'WHITE')
-        
-        print_colored(f"\nTotal: {len(self.processes)} nodos, {active} activos", 'MAGENTA')
-    
+
+            print_colored(
+                f"SimNode_{node_info['id']}: {status} ({node_info['behavior']})", 'WHITE')
+
+        print_colored(
+            f"\nTotal: {len(self.processes)} nodos, {active} activos", 'MAGENTA')
+
     def run_simulation(self, num_nodes, duration=None):
         """
         Ejecuta una simulación con múltiples nodos
         """
-        print_colored(f"\n🚀 Iniciando simulación con {num_nodes} nodos", 'CYAN')
-        
+        print_colored(
+            f"\n🚀 Iniciando simulación con {num_nodes} nodos", 'CYAN')
+
         # Definir comportamientos de los nodos
         behaviors = []
         if num_nodes <= 3:
@@ -367,20 +432,21 @@ if __name__ == "__main__":
                 ['ping'] * (num_nodes - 3 * (num_nodes // 3))
             )
             random.shuffle(behaviors)
-        
+
         # Iniciar nodos
         for i in range(num_nodes):
             self.start_node(i + 1, behaviors[i])
             time.sleep(0.5)  # Pequeña pausa entre inicios
-        
+
         print_colored(f"\n✅ {num_nodes} nodos iniciados", 'GREEN')
-        
+
         # Ejecutar simulación
         try:
             if duration:
-                print_colored(f"\n⏱️ Simulación ejecutándose por {duration} segundos...", 'CYAN')
+                print_colored(
+                    f"\n⏱️ Simulación ejecutándose por {duration} segundos...", 'CYAN')
                 print_colored("Presiona Ctrl+C para detener antes", 'WHITE')
-                
+
                 for remaining in range(duration, 0, -1):
                     if remaining % 10 == 0:
                         self.show_status()
@@ -388,66 +454,68 @@ if __name__ == "__main__":
             else:
                 print_colored("\n⏱️ Simulación en ejecución", 'CYAN')
                 print_colored("Presiona Ctrl+C para detener", 'WHITE')
-                
+
                 while True:
                     time.sleep(10)
                     self.show_status()
-                    
+
         except KeyboardInterrupt:
             print_colored("\n⏹ Simulación interrumpida por usuario", 'YELLOW')
-        
+
         finally:
             self.stop_all_nodes()
 
 
 def main():
     """
-    Función principal
+    Función principal para ejecutar el simulador
     """
-    print_colored("\n" + "="*60, 'CYAN')
-    print_colored("   SIMULADOR DE MÚLTIPLES NODOS", 'CYAN')
-    print_colored("="*60 + "\n", 'CYAN')
-    
-    # Verificar carpeta de logs
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
-    
-    print_colored("Este simulador creará múltiples nodos automáticamente", 'YELLOW')
-    print_colored("Útil para probar el sistema con varios participantes\n", 'YELLOW')
-    
-    # Menú de opciones
-    print_colored("Opciones de simulación:", 'WHITE')
-    print_colored("  1. Simulación rápida (3 nodos, 30 segundos)", 'WHITE')
-    print_colored("  2. Simulación media (5 nodos, 60 segundos)", 'WHITE')
-    print_colored("  3. Simulación completa (10 nodos, 120 segundos)", 'WHITE')
-    print_colored("  4. Simulación de estrés (20 nodos, sin límite)", 'WHITE')
-    print_colored("  5. Personalizada", 'WHITE')
-    
-    choice = input(f"\n{COLORS['CYAN']}Seleccionar opción (1-5): {COLORS['RESET']}")
-    
+    parser = argparse.ArgumentParser(
+        description="Simulador de Múltiples Nodos Multicast.")
+    parser.add_argument("--test-option", type=int,
+                        help="Número de la opción de prueba a ejecutar automáticamente.")
+    args = parser.parse_args()
+
     simulator = MultiNodeSimulator()
-    
-    if choice == '1':
-        simulator.run_simulation(3, 30)
-    elif choice == '2':
-        simulator.run_simulation(5, 60)
-    elif choice == '3':
-        simulator.run_simulation(10, 120)
-    elif choice == '4':
-        print_colored("\n⚠️ ADVERTENCIA: Esto creará 20 nodos", 'YELLOW')
-        confirm = input("¿Continuar? (s/n): ")
-        if confirm.lower() == 's':
-            simulator.run_simulation(20, None)
-    elif choice == '5':
-        num = int(input("Número de nodos (1-50): "))
-        duration = input("Duración en segundos (Enter para sin límite): ")
-        duration = int(duration) if duration else None
-        simulator.run_simulation(num, duration)
+
+    if args.test_option:
+        option = args.test_option
+        print_colored(
+            f"\\n🚀 Ejecutando opción de prueba automática: {option}", 'CYAN')
     else:
-        print_colored("Opción no válida", 'RED')
-    
-    print_colored("\n✅ Simulación completada", 'GREEN')
-    print_colored("Revisa los logs en la carpeta 'logs' para detalles", 'YELLOW')
+        print_colored("\\n" + "="*60, 'CYAN')
+        print_colored("   SIMULADOR DE MÚLTIPLES NODOS", 'CYAN')
+        print_colored("="*60, 'CYAN')
+        print("\\nOpciones de prueba:")
+        print("  1. 2 nodos, 30 segundos, comportamiento normal")
+        print("  2. 5 nodos, 60 segundos, comportamiento variado")
+        print("  3. 10 nodos, 120 segundos, alta carga (chatty)")
+        print("  4. 3 nodos, 180 segundos, solo pings y heartbeats")
+        print("  5. Personalizado")
+
+        try:
+            option = int(input("\\nSeleccionar opción (1-5): "))
+        except ValueError:
+            print_colored("Opción no válida. Saliendo.", 'RED')
+            return
+
+    if option == 1:
+        simulator.run_simulation(2, 30)
+    elif option == 2:
+        simulator.run_simulation(5, 60)
+    elif option == 3:
+        simulator.run_simulation(10, 120)
+    elif option == 4:
+        simulator.run_simulation(3, 180)
+    elif option == 5:
+        try:
+            num_nodes = int(input("Número de nodos: "))
+            duration = int(input("Duración en segundos: "))
+            simulator.run_simulation(num_nodes, duration)
+        except ValueError:
+            print_colored("Valores no válidos.", 'RED')
+    else:
+        print_colored("Opción no válida.", 'RED')
 
 
 if __name__ == "__main__":

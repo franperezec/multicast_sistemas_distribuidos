@@ -1,7 +1,7 @@
 """
 Configuración central para el sistema Multicast
-Autor: Tu Nombre
-Fecha: 2024
+Autor: Francisco Pérez
+Fecha: Noviembre 2025
 Proyecto: Implementación de Multicast y Concurrencia en Sistemas Distribuidos
 """
 
@@ -30,7 +30,7 @@ NODE_NAME = "Nodo_Francisco"  # <-- MODIFICAR ESTO
 
 # Para pruebas locales usar '0.0.0.0' o ''
 # Para ZeroTier usar la IP asignada (ej: '192.168.195.100')
-LOCAL_IP = ''  # Dejar vacío para pruebas locales
+LOCAL_IP = '192.168.194.33'  # IP de ZeroTier
 
 # ============================================
 # TIPOS DE MENSAJES
@@ -116,10 +116,19 @@ def print_colored(message, color='WHITE'):
     """
     Imprime mensaje con color en la consola
     """
-    if color in COLORS:
-        print(f"{COLORS[color]}{message}{COLORS['RESET']}")
-    else:
-        print(message)
+    import sys
+    try:
+        if color in COLORS:
+            print(f"{COLORS[color]}{message}{COLORS['RESET']}")
+        else:
+            print(message)
+    except UnicodeEncodeError:
+        # Si hay error de codificación, imprimir sin emojis
+        message_clean = message.encode('ascii', 'ignore').decode('ascii')
+        if color in COLORS:
+            print(f"{COLORS[color]}{message_clean}{COLORS['RESET']}")
+        else:
+            print(message_clean)
 
 # ============================================
 # INFORMACIÓN DEL SISTEMA
