@@ -11,7 +11,7 @@ from datetime import datetime
 
 MULTICAST_GROUP = '224.1.1.1'
 PORT = 5007
-LOCAL_IP = '192.168.194.33'
+LOCAL_IP = '0.0.0.0'  # Cambiar a tu IP si usas ZeroTier
 
 class SimulatedNode:
     def __init__(self, node_name):

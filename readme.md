@@ -1,125 +1,240 @@
-# 🌐 Sistema Multicast con Concurrencia - Sistemas Distribuidos
+# Sistema Multicast con Concurrencia - Sistemas Distribuidos
 
-## 📋 Descripción
-Implementación completa de un sistema de comunicación multicast con soporte para concurrencia avanzada, desarrollado en Python para el curso de Sistemas Distribuidos. El sistema incluye gestión automática de nodos, monitoreo en tiempo real, y herramientas de simulación y diagnóstico.
+**Universidad Técnica Particular de Loja**
+**Proyecto de Sistemas Distribuidos**
+**Noviembre 2025**
 
-## ✨ Características Principales
-- ✅ **Comunicación Multicast** - Envío y recepción de mensajes en grupo
-- ✅ **Concurrencia con Threads** - 4 threads simultáneos por nodo
-- ✅ **Detección Automática de Nodos** - Sistema de heartbeat y discovery
-- ✅ **Monitoreo en Tiempo Real** - Estadísticas y gráficos de actividad
-- ✅ **Simulador Multi-nodo** - Pruebas sin necesidad de múltiples usuarios
-- ✅ **Sistema de Agregación** - Recolección de estadísticas independiente del multicast
-- ✅ **Herramientas de Diagnóstico** - Tests de conectividad y validación
+---
 
-## 🚀 Instalación Rápida
+## Resumen Ejecutivo
 
-### 1. Requisitos Previos
-- Python 3.8 o superior
-- Windows 10/11, Linux o macOS
-- VSCode (recomendado)
+Sistema completo de comunicación multicast implementado en Python con soporte avanzado de concurrencia. El proyecto demuestra conceptos fundamentales de sistemas distribuidos incluyendo comunicación en grupo, sincronización multi-hilo, descubrimiento automático de nodos y monitoreo en tiempo real. Incluye herramientas de simulación, diagnóstico y soporte para redes virtuales mediante ZeroTier.
 
-### 2. Instalar Dependencias
+### Estado del Proyecto
+**COMPLETADO** - Todas las fases de desarrollo local funcionando correctamente.
+
+- Fase 1: Comunicación Multicast Básica ✓
+- Fase 2: Módulos Separados (Sender/Receiver) ✓
+- Fase 3: Concurrencia y Threads ✓
+- Fase 4: Red Virtual con ZeroTier ✓
+- Sistema de Monitoreo y Estadísticas ✓
+- Simulador Multi-nodo ✓
+- Herramientas de Diagnóstico ✓
+
+---
+
+## Tabla de Contenidos
+
+1. [Características Principales](#características-principales)
+2. [Requisitos del Sistema](#requisitos-del-sistema)
+3. [Instalación](#instalación)
+4. [Estructura del Proyecto](#estructura-del-proyecto)
+5. [Guía de Uso](#guía-de-uso)
+6. [Arquitectura del Sistema](#arquitectura-del-sistema)
+7. [Configuración de Red Virtual (ZeroTier)](#configuración-de-red-virtual-zerotier)
+8. [Solución de Problemas](#solución-de-problemas)
+9. [Conceptos Implementados](#conceptos-implementados)
+10. [Métricas de Rendimiento](#métricas-de-rendimiento)
+
+---
+
+## Características Principales
+
+### Comunicación Multicast
+- Envío y recepción de mensajes en grupo mediante UDP multicast
+- Dirección de grupo configurable (default: 224.1.1.1:5007)
+- Soporte para redes locales y virtuales (ZeroTier)
+
+### Concurrencia
+- Sistema multi-hilo con 4 threads concurrentes por nodo
+- Sincronización thread-safe mediante locks y colas
+- Prevención de race conditions y deadlocks
+
+### Gestión de Nodos
+- Detección automática de nodos mediante heartbeat
+- Sistema de descubrimiento distribuido
+- Timeout automático para nodos inactivos (90 segundos)
+
+### Monitoreo y Análisis
+- Monitor de red en tiempo real con estadísticas
+- Sistema de agregación de datos independiente
+- Generación automática de reportes
+- Herramientas de diagnóstico de conectividad
+
+### Simulación y Pruebas
+- Simulador de múltiples nodos sin necesidad de máquinas adicionales
+- Suite de pruebas de concurrencia (6 tests)
+- Validación automática del sistema
+- Orquestador de pruebas completas
+
+---
+
+## Requisitos del Sistema
+
+### Software
+- **Python**: 3.8 o superior
+- **Sistema Operativo**: Windows 10/11, Linux, o macOS
+- **Editor recomendado**: Visual Studio Code
+- **ZeroTier One** (opcional, para pruebas en red virtual)
+- **Wireshark** (opcional, para análisis de tráfico)
+
+### Dependencias Python
+
+El archivo `requirements.txt` contiene las dependencias del proyecto:
+
+```
+colorama>=0.4.6           # Opcional: Colores en consola Windows
+python-dateutil>=0.8.2    # Opcional: Formato mejorado de logs
+```
+
+**Nota importante**: El proyecto funciona con la biblioteca estándar de Python. Las dependencias en `requirements.txt` son **opcionales** y mejoran la experiencia visual (colorama) y el formato de logs (python-dateutil), pero no son obligatorias para el funcionamiento básico.
+
+---
+
+## Instalación
+
+### 1. Clonar o descargar el proyecto
+```bash
+cd multicast_sistemas_distribuidos
+```
+
+### 2. Instalar dependencias (opcional)
 ```bash
 pip install -r requirements.txt
 ```
 
-## 📁 Estructura del Proyecto
-```
-multicast_sistemas_distribuidos/
-├── config.py                      # ⚙️ Configuración central del sistema
-├── multicast_node.py              # 🎯 Nodo completo con concurrencia (CORE)
-│
-├── network_monitor.py             # 📊 Monitor de red en tiempo real
-├── multi_node_simulator.py        # 🔄 Simulador de múltiples nodos
-├── aggregate_stats.py             # 📈 Agregador de estadísticas
-├── run_full_test.py               # 🚀 Orquestador de pruebas completas
-│
-├── test_concurrency.py            # 🧪 Pruebas de concurrencia (6 tests)
-├── test_multicast.py              # 🔍 Diagnóstico de conectividad
-├── network_connectivity_test.py   # 🔍 Test de conectividad de red
-├── quick_check.py                 # ✅ Verificación rápida del sistema
-│
-├── manage_logs.py                 # 🧹 Gestor interactivo de logs
-├── clean_logs.py                  # 🗑️ Limpieza rápida de logs
-│
-├── logs/                          # 📝 Archivos de log y estadísticas
-│   ├── node_stats/               # Estadísticas de nodos individuales
-│   ├── aggregate_report_*.txt    # Reportes consolidados
-│   └── connectivity_report_*.txt # Reportes de conectividad
-├── capturas/                      # 📸 Screenshots para documentación
-└── requirements.txt               # 📦 Dependencias Python
+O instalar solo lo esencial:
+```bash
+pip install colorama
 ```
 
-**Nota:** Los módulos `sender.py`, `receiver.py` y `test_local.py` fueron removidos por redundancia, ya que su funcionalidad está completamente integrada en `multicast_node.py`.
-
-## 🎮 Guía de Uso
-
-### 🔴 IMPORTANTE: Configuración Inicial
-Antes de ejecutar, edita `config.py` y configura tu nombre:
+### 3. Configurar el nodo
+Editar `config.py` y establecer un nombre único:
 ```python
-NODE_NAME = "Nodo_TuNombre"  # <-- Cambia TuNombre por tu nombre real
+NODE_NAME = "Nodo_TuNombre"  # Reemplazar con tu nombre
+LOCAL_IP = '0.0.0.0'         # Para red local
 ```
 
-### � Verificación Rápida del Sistema
+### 4. Verificar instalación
 ```bash
 python quick_check.py
 ```
+
 Este script verifica que todo esté correctamente instalado y configurado.
 
-### 🎯 Opción 1: Prueba Completa Automatizada (RECOMENDADO)
+---
+
+## Estructura del Proyecto
+
+### Componentes Principales
+
+```
+multicast_sistemas_distribuidos/
+├── config.py                      # Configuración central del sistema
+├── multicast_node.py              # Nodo completo con concurrencia (CORE)
+│
+├── network_monitor.py             # Monitor de red en tiempo real
+├── multi_node_simulator.py        # Simulador de múltiples nodos
+├── aggregate_stats.py             # Agregador de estadísticas
+├── run_full_test.py               # Orquestador de pruebas completas
+│
+├── test_concurrency.py            # Suite de pruebas de concurrencia
+├── test_multicast.py              # Diagnóstico de conectividad multicast
+├── network_connectivity_test.py   # Test de conectividad de red
+├── quick_check.py                 # Verificación rápida del sistema
+│
+├── zerotier_setup.py              # Asistente de configuración ZeroTier
+├── zerotier_test.py               # Pruebas específicas de ZeroTier
+├── verificar_firewall.py          # Diagnóstico de firewall
+├── test_local_multicast.py        # Test de recepción local
+│
+├── manage_logs.py                 # Gestor interactivo de logs
+├── clean_logs.py                  # Limpieza rápida de logs
+│
+├── requirements.txt               # Dependencias Python
+├── readme.md                      # Este archivo (documentación principal)
+│
+├── logs/                          # Archivos de log y estadísticas
+│   ├── node_stats/               # Estadísticas de nodos individuales
+│   ├── aggregate_report_*.txt    # Reportes consolidados
+│   └── connectivity_report_*.txt # Reportes de conectividad
+│
+└── capturas/                      # Screenshots para documentación
+```
+
+### Módulos Legacy (integrados en multicast_node.py)
+- `sender.py` - Funcionalidad integrada
+- `receiver.py` - Funcionalidad integrada
+- `test_local.py` - Reemplazado por quick_check.py
+
+---
+
+## Guía de Uso
+
+### Verificación Inicial
+
+Antes de comenzar, ejecutar la verificación del sistema:
+```bash
+python quick_check.py
+```
+
+### Opción 1: Prueba Completa Automatizada (RECOMENDADO)
+
 La forma más rápida de probar todo el sistema:
 
 ```bash
-# Ejecuta simulación completa con 5 nodos y genera reporte
 python run_full_test.py --test-option 2
 ```
 
-Opciones disponibles:
+**Opciones disponibles:**
 - `--test-option 1`: 2 nodos, 30 segundos (prueba rápida)
 - `--test-option 2`: 5 nodos, 60 segundos (prueba estándar)
 - `--test-option 3`: 10 nodos, 120 segundos (prueba de carga)
 - `--test-option 4`: 3 nodos, 180 segundos (prueba extendida)
 
-### 🎯 Opción 2: Nodo Completo con Concurrencia
-Ejecuta un nodo interactivo completo:
+Esta opción:
+- Lanza automáticamente el monitor de red
+- Ejecuta el simulador de nodos
+- Genera reportes consolidados
+- Muestra resumen de estadísticas
+
+### Opción 2: Nodo Interactivo
+
+Ejecutar un nodo completo con interfaz de comandos:
 
 ```bash
 python multicast_node.py
 ```
 
-**Comandos disponibles:**
+**Comandos disponibles en el nodo:**
 - `/help` - Mostrar ayuda
-- `/status` - Ver estado del nodo
-- `/nodes` - Listar nodos activos
-- `/ping` - Enviar ping a todos
+- `/status` - Ver estado del nodo y threads
+- `/nodes` - Listar nodos activos detectados
+- `/ping` - Enviar ping a todos los nodos
 - `/stats` - Ver estadísticas detalladas
 - `/clear` - Limpiar pantalla
 - `/exit` - Salir del programa
 
-### 🎯 Opción 3: Pruebas Básicas (Legacy)
+### Opción 3: Simulador de Múltiples Nodos
 
-**Test Local Básico:**
 ```bash
-python test_local.py
+python multi_node_simulator.py
 ```
 
-**Receptor y Emisor Separados:**
-```bash
-# Terminal 1 - Receptor
-python receiver.py
+**Escenarios de simulación:**
+1. 2 nodos, 30 segundos - Comportamiento normal
+2. 5 nodos, 60 segundos - Comportamiento variado
+3. 10 nodos, 120 segundos - Alta carga (chatty)
+4. 3 nodos, 180 segundos - Solo pings y heartbeats
+5. Personalizado - Configura tus propios parámetros
 
-# Terminal 2 - Emisor
-python sender.py
-```
+### Opción 4: Monitor de Red en Tiempo Real
 
-## � Herramientas de Análisis y Diagnóstico
-
-### 📊 Monitor de Red en Tiempo Real
 ```bash
 python network_monitor.py
 ```
-Muestra:
+
+Visualiza:
 - Estadísticas generales (mensajes, bytes, nodos)
 - Tasas de transferencia (actual y promedio)
 - Top nodos por actividad
@@ -127,71 +242,58 @@ Muestra:
 - Gráfico de actividad en tiempo real
 - Lista de nodos activos
 
-### 🧪 Simulador de Múltiples Nodos
-```bash
-python multi_node_simulator.py
-```
-Opciones de simulación:
-1. 2 nodos, 30 segundos - Comportamiento normal
-2. 5 nodos, 60 segundos - Comportamiento variado
-3. 10 nodos, 120 segundos - Alta carga (chatty)
-4. 3 nodos, 180 segundos - Solo pings y heartbeats
-5. Personalizado - Configura tus propios parámetros
+### Herramientas de Diagnóstico
 
-### 🔍 Test de Concurrencia
+**Test de concurrencia:**
 ```bash
 python test_concurrency.py
 ```
-Valida:
-- Creación y gestión de threads
-- Colas thread-safe (Queue)
-- Prevención de race conditions
-- Prevención de deadlocks
-- Manejo de recursos compartidos con locks
+Valida 6 aspectos de la implementación concurrente.
 
-### 🌐 Diagnóstico de Conectividad Multicast
+**Diagnóstico de multicast:**
 ```bash
-# Test de envío
-python test_multicast.py sender
-
-# Test de recepción (en otra terminal)
+# Terminal 1 - Receptor
 python test_multicast.py receiver
+
+# Terminal 2 - Emisor
+python test_multicast.py sender
 ```
 
-## 🏗️ Arquitectura del Sistema
+**Test de conectividad completo:**
+```bash
+python network_connectivity_test.py
+```
 
-### Componentes Principales
+---
 
-#### 1. Nodo Multicast (`multicast_node.py`)
-- **4 Threads Concurrentes:**
-  - `receiver_thread`: Recibe mensajes del grupo multicast
-  - `sender_thread`: Envía mensajes desde cola de salida
-  - `heartbeat_thread`: Envía señales de vida cada 30s
-  - `monitor_thread`: Actualiza estadísticas cada 10s
+## Arquitectura del Sistema
 
-- **Sincronización Thread-Safe:**
-  - `queue.Queue` para mensajes entrantes/salientes
-  - `threading.Lock` para proteger recursos compartidos
-  - Prevención de race conditions y deadlocks
+### Componente Principal: Nodo Multicast
 
-- **Gestión de Nodos:**
-  - Detección automática de nodos activos
-  - Timeout de 90 segundos para nodos inactivos
-  - Sistema de heartbeat distribuido
+Cada nodo ejecuta **4 threads concurrentes:**
 
-#### 2. Sistema de Agregación de Estadísticas
-- **Independiente del Multicast:** No depende de captura de red
-- **Basado en Archivos:** Cada nodo escribe sus stats en JSON
-- **Agregación Centralizada:** `aggregate_stats.py` consolida datos
-- **Solución al Firewall:** Evita bloqueos de Windows Firewall
+1. **receiver_thread**: Escucha mensajes del grupo multicast
+2. **sender_thread**: Procesa y envía mensajes desde cola de salida
+3. **heartbeat_thread**: Envía señales de vida cada 30 segundos
+4. **monitor_thread**: Actualiza estadísticas cada 10 segundos
 
-#### 3. Orquestador de Pruebas (`run_full_test.py`)
-- Lanza monitor y simulador automáticamente
-- Gestiona ciclo de vida de procesos
-- Genera reportes consolidados
-- Muestra resumen al finalizar
+### Sincronización Thread-Safe
 
-### Flujo de Datos
+- **queue.Queue**: Colas para mensajes entrantes y salientes
+- **threading.Lock**: Protección de recursos compartidos
+- **Event Signaling**: Coordinación entre threads
+- **Daemon Threads**: Terminación automática al salir
+
+### Sistema de Agregación de Estadísticas
+
+**Diseño independiente del multicast:**
+- Cada nodo escribe estadísticas en archivos JSON
+- Agregador central consolida datos sin depender de captura multicast
+- Soluciona problemas de firewall bloqueando tráfico
+- Permite análisis sin necesidad de captura de paquetes
+
+### Flujo de Comunicación
+
 ```
 Nodo A                    Nodo B                    Nodo C
   |                         |                         |
@@ -212,176 +314,373 @@ Nodo A                    Nodo B                    Nodo C
        [Reporte Consolidado]
 ```
 
-## � Resultados Esperados
+### Gestión de Nodos
 
-### Prueba Completa Exitosa
-Al ejecutar `python run_full_test.py --test-option 2`, deberías ver:
+- **Detección automática**: Descubrimiento mediante heartbeats
+- **Registro de nodos**: Almacenamiento de timestamp de última actividad
+- **Limpieza automática**: Eliminación de nodos inactivos (> 90s)
+- **Sincronización**: Locks para acceso concurrente a estructuras compartidas
+
+---
+
+## Configuración de Red Virtual (ZeroTier)
+
+### Instalación de ZeroTier
+
+**Windows:**
+1. Descargar de https://www.zerotier.com/download/
+2. Ejecutar instalador como Administrador
+3. Verificar instalación:
+```cmd
+zerotier-cli info
+```
+
+**Linux:**
+```bash
+curl -s https://install.zerotier.com | sudo bash
+sudo zerotier-cli info
+```
+
+**macOS:**
+```bash
+brew install --cask zerotier-one
+zerotier-cli info
+```
+
+### Configuración de Red
+
+#### Opción A: Crear Red (Coordinador del equipo)
+
+1. Crear cuenta en https://my.zerotier.com
+2. Click en "Create A Network"
+3. Anotar Network ID (16 caracteres)
+4. Configurar:
+   - Name: `Multicast_SistemasDistribuidos`
+   - Access Control: `Private`
+   - IPv4 Auto-Assign: Activado
+   - Rango: `192.168.195.*`
+
+#### Opción B: Unirse a Red Existente
+
+```cmd
+zerotier-cli join [NETWORK_ID]
+```
+
+Esperar autorización del administrador (1-2 minutos).
+
+### Configuración del Proyecto
+
+1. **Ejecutar asistente de configuración:**
+```bash
+python zerotier_setup.py
+# Seleccionar opción 4: Configurar proyecto
+```
+
+2. **Verificar IP asignada:**
+```cmd
+zerotier-cli listnetworks
+```
+
+3. **Actualizar config.py:**
+```python
+LOCAL_IP = '192.168.195.100'  # Tu IP de ZeroTier
+NODE_NAME = 'Nodo_TuNombre'
+```
+
+### Pruebas de Conectividad
+
+**Test completo:**
+```bash
+python network_connectivity_test.py
+```
+
+**Test específico de ZeroTier:**
+```bash
+python zerotier_test.py
+```
+
+### Configuración de Firewall (CRÍTICO)
+
+El firewall de Windows bloquea por defecto el tráfico multicast UDP. Es necesario configurarlo antes de realizar pruebas.
+
+**Diagnóstico:**
+```bash
+python verificar_firewall.py
+```
+
+**Configuración Windows (PowerShell como Administrador):**
+```powershell
+netsh advfirewall firewall add rule name="Multicast Port 5007" dir=in action=allow protocol=UDP localport=5007
+```
+
+**Verificación:**
+```bash
+python test_local_multicast.py
+```
+
+Resultado esperado: Mensajes enviados = Mensajes recibidos
+
+**Configuración Linux:**
+```bash
+# UFW
+sudo ufw allow 5007/udp
+
+# Firewalld
+sudo firewall-cmd --permanent --add-port=5007/udp
+sudo firewall-cmd --reload
+```
+
+### Pruebas en Equipo
+
+**Coordinador:**
+```bash
+python team_test_coordinator.py
+# Opción 1: Coordinador
+```
+
+**Participantes:**
+```bash
+python team_test_coordinator.py
+# Opción 2: Participante
+```
+
+### Análisis con Wireshark
+
+1. Seleccionar interfaz ZeroTier (`zt*`)
+2. Filtro: `udp.port == 5007 and ip.dst == 224.1.1.1`
+3. Capturar durante 30-60 segundos
+4. Guardar como: `multicast_zerotier_capture.pcapng`
+
+**Capturas recomendadas para documentación:**
+- Vista general de paquetes multicast
+- Detalle de paquete (IP source/dest, protocolo, puerto)
+- Payload mostrando JSON del mensaje
+- Estadísticas: Conversations → IPv4
+- Protocol Hierarchy
+
+---
+
+## Solución de Problemas
+
+### Error: "Address already in use"
+
+**Windows:**
+```cmd
+netstat -ano | findstr :5007
+taskkill /F /PID [PID_NUMBER]
+```
+
+**Linux/Mac:**
+```bash
+lsof -i :5007
+kill -9 [PID_NUMBER]
+```
+
+**Alternativa**: Cambiar puerto en `config.py`
+
+### Nodos no se detectan entre sí
+
+1. Verificar mismo `MULTICAST_GROUP` y `PORT` en `config.py`
+2. Verificar firewall permite puerto 5007/UDP
+3. Asegurarse de estar en la misma red (local o ZeroTier)
+4. Ejecutar diagnóstico:
+```bash
+python network_connectivity_test.py
+```
+
+### Firewall bloqueando multicast
+
+**Diagnóstico completo:**
+```bash
+python verificar_firewall.py
+```
+
+**Prueba de recepción local:**
+```bash
+python test_local_multicast.py
+```
+
+Si recibes 0 mensajes, el firewall está bloqueando el tráfico.
+
+**Solución permanente:**
+- Configurar regla de firewall para puerto 5007/UDP (ver sección ZeroTier)
+- El sistema usa agregación de estadísticas basada en archivos como alternativa
+
+### No se detecta IP de ZeroTier
+
+1. Verificar autorización en ZeroTier Central (https://my.zerotier.com)
+2. Esperar 2-3 minutos para asignación de IP
+3. Reiniciar servicio:
+```cmd
+# Windows
+net stop ZeroTierOneService
+net start ZeroTierOneService
+
+# Linux
+sudo systemctl restart zerotier-one
+```
+
+### ZeroTier OFFLINE
+
+Verificar estado:
+```cmd
+zerotier-cli info
+```
+
+Si muestra `OFFLINE`, reiniciar servicio (ver comando arriba).
+
+### Threads no se detienen
+
+- Usar `/exit` en lugar de Ctrl+C
+- Si persiste, cerrar terminal completa
+- Los threads están marcados como daemon y deberían terminar automáticamente
+
+---
+
+## Conceptos Implementados
+
+### Sistemas Distribuidos
+- Comunicación multicast (one-to-many)
+- Descubrimiento automático de nodos
+- Sistema de heartbeat distribuido
+- Tolerancia a fallos (detección de nodos caídos)
+- Coordinación distribuida
+
+### Concurrencia
+- Programación multi-hilo (4 threads por nodo)
+- Sincronización con locks
+- Colas thread-safe (producer-consumer pattern)
+- Prevención de race conditions
+- Prevención de deadlocks
+- Manejo seguro de recursos compartidos
+
+### Arquitectura de Software
+- Separación de responsabilidades
+- Modularización del código
+- Configuración centralizada
+- Logging estructurado y monitoreo
+- Manejo robusto de errores
+- Patrones de diseño (Observer, Producer-Consumer)
+
+### Redes de Computadoras
+- Protocolo UDP
+- Direccionamiento multicast
+- Sockets de red
+- Time-To-Live (TTL) para multicast
+- Redes virtuales privadas (ZeroTier)
+
+---
+
+## Métricas de Rendimiento
+
+### Rendimiento Esperado
+- **Latencia de mensajes**: < 100ms en red local, < 50ms en ZeroTier
+- **Throughput**: > 100 mensajes/segundo
+- **CPU por nodo**: < 5% en idle, < 15% en actividad
+- **Memoria por nodo**: < 50 MB
+- **Threads por nodo**: 4-5 threads activos
+- **Tiempo de detección de nodo muerto**: ~90 segundos
+- **Pérdida de paquetes**: 0% en condiciones normales
+
+### Resultados de Prueba Exitosa
+
+Al ejecutar `python run_full_test.py --test-option 2`:
 
 ```
-============================================================
-   INICIANDO PRUEBA COMPLETA AUTOMATIZADA
-============================================================
-
-[1/3] 📊 Lanzando el monitor de red en segundo plano...
-     ✓ Monitor de red iniciado.
-
-[2/3] 🚀 Lanzando la simulación de nodos (Opción 2)...
-
-🚀 Iniciando simulación con 5 nodos
-✅ Nodo SimNode_1 iniciado (normal)
-✅ Nodo SimNode_2 iniciado (quiet)
-✅ Nodo SimNode_3 iniciado (chatty)
-✅ Nodo SimNode_4 iniciado (ping)
-✅ Nodo SimNode_5 iniciado (ping)
-
-📊 ESTADO DE NODOS SIMULADOS
-SimNode_1: 🟢 Activo (normal)
-SimNode_2: 🟢 Activo (quiet)
-SimNode_3: 🟢 Activo (chatty)
-SimNode_4: 🟢 Activo (ping)
-SimNode_5: 🟢 Activo (ping)
-
-[4/4] 📊 Generando reporte de estadísticas...
-
 ============================================================
    RESUMEN DE ESTADÍSTICAS DE NODOS
 ============================================================
 
-📊 Total de mensajes: 322
-📦 Total de bytes: 36,130
-👥 Nodos detectados: 5
-⚠️  Errores: 0
+Total de mensajes: 322
+Total de bytes: 36,130
+Nodos detectados: 5
+Errores: 0
 
-📈 Actividad por nodo:
+Actividad por nodo:
    • SimNode_5: 99 mensajes, 11,098 bytes
    • SimNode_3: 92 mensajes, 10,324 bytes
    • SimNode_1: 77 mensajes, 8,637 bytes
    • SimNode_4: 49 mensajes, 5,512 bytes
    • SimNode_2: 5 mensajes, 559 bytes
 
-✅ Prueba finalizada.
+Prueba finalizada.
 ```
 
-### Métricas de Rendimiento
-- **Latencia de mensajes:** < 100ms en red local
-- **Mensajes por segundo:** > 100 msgs/s
-- **CPU por nodo:** < 5% en idle, < 15% activo
-- **Memoria por nodo:** < 50 MB
-- **Threads por nodo:** 4-5 threads activos
-- **Tiempo de detección de nodo muerto:** 90 segundos
+---
 
-## �🐛 Solución de Problemas
+## Gestión de Logs
 
-### Error: "Python no encontrado" o "no se encontró Python"
-**Windows:**
-- Instalar Python desde https://www.python.org/
-- Marcar "Add Python to PATH" durante instalación
-- O usar el launcher: `py quick_check.py` en lugar de `python quick_check.py`
-
-### Error: "Address already in use"
+### Opción 1: Gestor Interactivo (RECOMENDADO)
 ```bash
-# Windows - Liberar puerto
-netstat -ano | findstr :5007
-taskkill /F /PID [PID_NUMBER]
-
-# Linux/Mac
-lsof -i :5007
-kill -9 [PID_NUMBER]
-```
-O cambiar el puerto en `config.py`:
-```python
-PORT = 5008  # Cambiar a otro número
+python manage_logs.py
 ```
 
-### Firewall Bloqueando Multicast
-**Solución Temporal:**
-1. Desactivar Windows Firewall temporalmente
-2. Ejecutar pruebas
-3. Reactivar firewall
+Funciones:
+- Ver estadísticas de logs
+- Listar archivos
+- Borrar por antigüedad (días)
+- Borrar por tipo
+- Borrar todos
 
-**Solución Permanente:**
-- El sistema usa agregación de estadísticas basada en archivos
-- No depende de captura multicast para reportes
-- Los nodos SÍ se comunican por multicast entre ellos
-
-### Nodos no se detectan entre sí
-1. Verificar que todos usan mismo `MULTICAST_GROUP` y `PORT` en `config.py`
-2. Verificar firewall permite Python
-3. Asegurarse de estar en la misma red local
-4. Probar con `test_multicast.py` para diagnóstico
-
-### Error de Encoding/UTF-8 en Windows
-Si ves caracteres extraños:
-```python
-# En tu terminal PowerShell
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+### Opción 2: Limpieza Rápida
+```bash
+python clean_logs.py
 ```
 
-### Threads no se detienen al salir
-- Usar `/exit` en lugar de Ctrl+C
-- Si persiste, cerrar la terminal completa
-- Los threads están marcados como daemon y deberían terminar automáticamente
+### Ubicación de Logs
+```
+logs/
+├── node_stats/                  # Estadísticas JSON por nodo
+├── aggregate_report_*.txt       # Reportes consolidados
+├── connectivity_report_*.txt    # Reportes de conectividad
+├── network_monitor_*.log        # Logs del monitor
+└── sim_node_*_err.log          # Errores de nodos simulados
+```
 
-## ✅ Checklist de Validación
+---
+
+## Checklist de Validación
 
 ### Configuración Inicial
-- [ ] Python 3.8+ instalado y en PATH
-- [ ] Dependencias instaladas (`pip install -r requirements.txt`)
+- [ ] Python 3.8+ instalado
+- [ ] Dependencias instaladas (opcional)
 - [ ] Nombre de nodo configurado en `config.py`
-- [ ] Verificación rápida ejecutada (`python quick_check.py`)
+- [ ] `quick_check.py` ejecutado exitosamente
 
 ### Pruebas Básicas
-- [ ] `test_local.py` ejecutado exitosamente
-- [ ] `test_concurrency.py` - todas las pruebas pasan
+- [ ] `test_concurrency.py` - 6 tests pasados
 - [ ] `test_multicast.py` - sender y receiver funcionan
+- [ ] `test_local_multicast.py` - recepción local funciona
 
-### Pruebas de Concurrencia
-- [ ] `multicast_node.py` se ejecuta sin errores
+### Pruebas de Sistema
+- [ ] `multicast_node.py` ejecuta sin errores
 - [ ] Los 4 threads se inician correctamente
-- [ ] Comandos `/help`, `/status`, `/ping`, `/nodes` funcionan
+- [ ] Comandos `/status`, `/nodes`, `/ping` funcionan
 - [ ] Heartbeats se envían automáticamente
-- [ ] Nodos se detectan mutuamente
 
 ### Pruebas Completas
-- [ ] `run_full_test.py --test-option 1` ejecutado exitosamente
-- [ ] `run_full_test.py --test-option 2` muestra 5 nodos activos
-- [ ] Reporte agregado generado con estadísticas
-- [ ] Monitor de red muestra actividad en tiempo real
+- [ ] `run_full_test.py --test-option 2` exitoso
+- [ ] 5 nodos simulados activos
+- [ ] Reporte agregado generado
+- [ ] Monitor muestra actividad en tiempo real
 
-### Para el Informe
-- [ ] Screenshots de pruebas exitosas
-- [ ] Capturas del monitor mostrando estadísticas
-- [ ] Logs guardados en carpeta `logs/`
-- [ ] Reporte agregado más reciente revisado
+### ZeroTier (Fase 4)
+- [ ] ZeroTier instalado y funcionando
+- [ ] Unido a red del equipo
+- [ ] IP de ZeroTier recibida
+- [ ] Firewall configurado correctamente
+- [ ] Comunicación exitosa con compañeros
+- [ ] Captura Wireshark realizada
 
-## 📸 Capturas Recomendadas para el Informe
+### Documentación
+- [ ] Screenshots de pruebas
+- [ ] Logs guardados
+- [ ] Reportes generados
+- [ ] Capturas de Wireshark (si aplica)
 
-1. **Verificación del Sistema:**
-   - Salida de `quick_check.py`
-   - Salida de `test_concurrency.py` (todas las pruebas pasadas)
+---
 
-2. **Nodo Completo:**
-   - `multicast_node.py` ejecutándose con comando `/status`
-   - Comando `/nodes` mostrando nodos detectados
-   - Comando `/stats` mostrando estadísticas detalladas
-
-3. **Simulación Multi-nodo:**
-   - `multi_node_simulator.py` con 5 nodos activos
-   - Estado mostrando nodos 🟢 Activo
-
-4. **Prueba Completa:**
-   - Salida completa de `run_full_test.py --test-option 2`
-   - Resumen de estadísticas mostrando mensajes y bytes
-
-5. **Monitor de Red:**
-   - `network_monitor.py` mostrando gráficos de actividad
-   - Distribución de mensajes por nodo
-   - Tasas de transferencia
-
-6. **Reporte Agregado:**
-   - Contenido de `logs/aggregate_report_[timestamp].txt`
-
-## 📝 Comandos Útiles
+## Comandos Útiles de Referencia
 
 ### Ver logs
 ```bash
@@ -390,36 +689,6 @@ type logs\aggregate_report_*.txt | more
 
 # Linux/Mac
 cat logs/aggregate_report_*.txt | less
-```
-
-### 🧹 Gestión de Logs
-
-#### Opción 1: Gestor Interactivo (RECOMENDADO)
-```bash
-python manage_logs.py
-```
-Funciones:
-- Ver estadísticas de logs (total, tamaño, antigüedad)
-- Listar archivos de log
-- Borrar logs antiguos (por días)
-- Borrar logs por tipo (connectivity, simulation, stats, network)
-- Borrar TODOS los logs
-
-#### Opción 2: Limpieza Rápida
-```bash
-python clean_logs.py
-```
-Borra todos los logs con confirmación simple.
-
-#### Opción 3: Comandos Manuales
-```bash
-# Windows
-Remove-Item -Path "logs\sim_node_*" -Force
-Remove-Item -Path "logs\node_stats\*" -Force
-
-# Linux/Mac
-rm -f logs/sim_node_*
-rm -f logs/node_stats/*
 ```
 
 ### Verificar procesos Python activos
@@ -431,7 +700,7 @@ wmic process where "name='python.exe'" get ProcessId,CommandLine
 ps aux | grep python
 ```
 
-### Matar todos los procesos Python (si es necesario)
+### Matar procesos Python (emergencia)
 ```bash
 # Windows
 taskkill /F /IM python.exe
@@ -440,74 +709,44 @@ taskkill /F /IM python.exe
 killall python
 ```
 
-## 🎓 Conceptos Implementados
+### Verificar puerto en uso
+```bash
+# Windows
+netstat -ano | findstr :5007
 
-### Sistemas Distribuidos
-- ✅ Comunicación por Multicast (one-to-many)
-- ✅ Descubrimiento automático de nodos
-- ✅ Sistema de heartbeat distribuido
-- ✅ Tolerancia a fallos (detección de nodos caídos)
+# Linux/Mac
+lsof -i :5007
+```
 
-### Concurrencia
-- ✅ Programación con threads (4 por nodo)
-- ✅ Sincronización con locks
-- ✅ Colas thread-safe (producer-consumer)
-- ✅ Prevención de race conditions
-- ✅ Prevención de deadlocks
+---
 
-### Arquitectura de Software
-- ✅ Separación de responsabilidades
-- ✅ Modularización del código
-- ✅ Configuración centralizada
-- ✅ Logging y monitoreo
-- ✅ Manejo de errores
+## Recursos y Soporte
 
-## 🚀 Próximos Pasos
-
-### Fase 4: Red Virtual con ZeroTier
-1. Instalar ZeroTier One
-2. Crear/unirse a una red virtual
-3. Modificar `LOCAL_IP` en `config.py` con IP de ZeroTier
-4. Coordinar pruebas con compañeros de clase
-
-### Fase 5: Pruebas en Red Real
-1. Ejecutar nodos en diferentes máquinas
-2. Validar comunicación entre nodos remotos
-3. Analizar latencia y rendimiento
-4. Documentar resultados para el informe final
-
-## 📧 Soporte y Recursos
-
-**Si tienes problemas:**
-1. Ejecutar `python quick_check.py` para diagnóstico
-2. Revisar logs en `logs/aggregate_report_*.txt`
-3. Verificar firewall y permisos
-4. Consultar sección "Solución de Problemas" arriba
-
-**Archivos Clave para Depuración:**
+### Archivos Clave para Depuración
 - `logs/sim_node_*_err.log` - Errores de nodos simulados
-- `logs/node_stats/*.json` - Estadísticas individuales
-- `logs/aggregate_report_*.txt` - Reporte consolidado
+- `logs/node_stats/*.json` - Estadísticas individuales de nodos
+- `logs/aggregate_report_*.txt` - Reporte consolidado de actividad
+
+### Herramientas de Diagnóstico
+1. `quick_check.py` - Verificación general del sistema
+2. `verificar_firewall.py` - Diagnóstico de firewall
+3. `test_local_multicast.py` - Test de recepción local
+4. `network_connectivity_test.py` - Test completo de conectividad
+
+### Para Más Información
+- Documentación de ZeroTier: https://docs.zerotier.com
+- Wireshark User Guide: https://www.wireshark.org/docs/
+- Python Threading: https://docs.python.org/3/library/threading.html
+- Python Sockets: https://docs.python.org/3/library/socket.html
 
 ---
 
-## 🏆 Estado del Proyecto
+## Licencia
 
-**✅ COMPLETADO - Todas las fases de desarrollo local funcionando**
-
-- ✅ Fase 1: Comunicación Multicast Básica
-- ✅ Fase 2: Módulos Separados (Sender/Receiver)
-- ✅ Fase 3: Concurrencia y Threads
-- ✅ Sistema de Monitoreo y Estadísticas
-- ✅ Simulador Multi-nodo
-- ✅ Herramientas de Diagnóstico
-- 🔄 Fase 4: Red Virtual (Siguiente)
-
-**Progreso:** 75% completado 🎉
+Proyecto académico desarrollado para el curso de Sistemas Distribuidos.
+Universidad Técnica Particular de Loja - 2025
 
 ---
 
-**Proyecto de Sistemas Distribuidos**  
-*Implementación de Multicast y Concurrencia*  
-*Universidad Técnica Particular de Loja*  
-*Noviembre 2025*
+**Última actualización**: Noviembre 2025
+**Versión**: 1.0 - Proyecto Completo

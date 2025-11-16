@@ -1,8 +1,8 @@
 """
 Configuración central para el sistema Multicast
-Autor: Francisco Pérez
-Fecha: Noviembre 2025
 Proyecto: Implementación de Multicast y Concurrencia en Sistemas Distribuidos
+Universidad Técnica Particular de Loja
+Fecha: Noviembre 2025
 """
 
 import socket
@@ -26,11 +26,11 @@ TTL = 2  # Time-to-live (2 = red local y siguiente salto)
 # ============================================
 
 # IMPORTANTE: Cambia este nombre por tu nombre o identificador único
-NODE_NAME = "Nodo_Francisco"  # <-- MODIFICAR ESTO
+NODE_NAME = "Nodo_TuNombre"  # <-- MODIFICAR ESTO
 
 # Para pruebas locales usar '0.0.0.0' o ''
 # Para ZeroTier usar la IP asignada (ej: '192.168.195.100')
-LOCAL_IP = '10.184.53.33'  # IP de ZeroTier
+LOCAL_IP = '0.0.0.0'  # Cambiar a tu IP de ZeroTier si usas red virtual
 
 # ============================================
 # TIPOS DE MENSAJES

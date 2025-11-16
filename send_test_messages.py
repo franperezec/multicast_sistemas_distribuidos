@@ -5,8 +5,8 @@ from datetime import datetime
 
 MULTICAST_GROUP = '224.1.1.1'
 PORT = 5007
-LOCAL_IP = '192.168.194.33'
-NODE_NAME = 'Nodo_Francisco'
+LOCAL_IP = '0.0.0.0'  # Cambiar a tu IP
+NODE_NAME = 'Nodo_Test'
 
 print("Enviando mensajes de prueba...")
 

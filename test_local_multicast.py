@@ -13,7 +13,7 @@ from datetime import datetime
 # Configuración
 MULTICAST_GROUP = '224.1.1.1'
 PORT = 5007
-LOCAL_IP = '10.184.53.33'
+LOCAL_IP = '0.0.0.0'  # Usar 0.0.0.0 para red local o tu IP de ZeroTier
 TEST_DURATION = 10  # segundos
 
 # Contadores
@@ -220,7 +220,7 @@ else:
     print("\nPROXIMOS PASOS:")
     print("  1. Asegurate que tus companeros:")
     print("     - Esten conectados a la misma red ZeroTier")
-    print("     - Tengan IP 10.184.53.x asignada")
+    print("     - Tengan IP de ZeroTier asignada (mismo rango)")
     print("     - Tengan firewall configurado")
     print("  2. Ejecuten: python multicast_node.py")
     print("  3. Coordinen estar online al mismo tiempo")

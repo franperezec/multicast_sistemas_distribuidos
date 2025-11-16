@@ -11,8 +11,8 @@ from datetime import datetime
 # Configuracion
 MULTICAST_GROUP = '224.1.1.1'
 PORT = 5007
-LOCAL_IP = '192.168.194.33'  # Tu IP de ZeroTier
-NODE_NAME = 'Nodo_Francisco'  # Cambia esto por tu nombre
+LOCAL_IP = '0.0.0.0'  # Tu IP de ZeroTier - cambiar antes de usar
+NODE_NAME = 'Nodo_TuNombre'  # Cambia esto por tu nombre
 
 
 def create_simple_message(msg_type, content):
