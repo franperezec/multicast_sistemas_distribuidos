@@ -292,7 +292,78 @@ python multicast_node.py
 
 ---
 
-## 7. SOLUCIÓN DE PROBLEMAS
+## 7. CONFIGURACIÓN DE FIREWALL (CRÍTICO)
+
+### ⚠️ IMPORTANTE: Configurar firewall ANTES de las pruebas
+
+El firewall de Windows bloquea por defecto el tráfico multicast UDP. **Debes configurarlo antes de hacer pruebas con compañeros.**
+
+### Diagnóstico rápido del firewall
+
+Ejecuta este script para verificar si el firewall está bloqueando:
+```bash
+python verificar_firewall.py
+```
+
+El script te mostrará:
+- Estado del firewall
+- Si existe regla para puerto 5007/UDP
+- Recomendaciones específicas
+
+### Configuración del firewall (Windows)
+
+**Opción 1: Regla para puerto 5007/UDP (RECOMENDADO)**
+
+Abre PowerShell como **Administrador** y ejecuta:
+```powershell
+netsh advfirewall firewall add rule name="Multicast Port 5007" dir=in action=allow protocol=UDP localport=5007
+```
+
+**Opción 2: Regla para Python (alternativa)**
+```powershell
+netsh advfirewall firewall add rule name="Python Multicast" dir=in action=allow program="C:\Users\TU_USUARIO\AppData\Local\Programs\Python\Python312\python.exe" enable=yes
+```
+*(Ajusta la ruta a tu instalación de Python)*
+
+**Verificación:**
+Después de configurar, ejecuta:
+```bash
+python test_local_multicast.py
+```
+
+Deberías ver:
+```
+Mensajes enviados:   5
+Mensajes recibidos:  5  ✅
+```
+
+Si `Mensajes recibidos: 0`, el firewall sigue bloqueando.
+
+### Configuración del firewall (Linux)
+
+```bash
+# UFW (Ubuntu/Debian)
+sudo ufw allow 5007/udp
+
+# Firewalld (Fedora/CentOS)
+sudo firewall-cmd --permanent --add-port=5007/udp
+sudo firewall-cmd --reload
+
+# iptables
+sudo iptables -A INPUT -p udp --dport 5007 -j ACCEPT
+```
+
+### Configuración del firewall (macOS)
+
+macOS generalmente permite el tráfico multicast por defecto. Si tienes problemas:
+
+1. Sistema → Preferencias → Seguridad y privacidad → Firewall
+2. Opciones del Firewall
+3. Agregar Python y permitir conexiones entrantes
+
+---
+
+## 8. SOLUCIÓN DE PROBLEMAS
 
 ### PROBLEMA: "No se detecta IP de ZeroTier"
 **Solución:**
@@ -305,17 +376,39 @@ Si no hay IP:
 - Reiniciar servicio ZeroTier
 
 ### PROBLEMA: "No recibo mensajes de otros nodos"
-**Solución:**
-1. Verificar firewall:
-   ```cmd
-   # Windows - Permitir Python
-   netsh advfirewall firewall add rule name="Python Multicast" dir=in action=allow program="C:\path\to\python.exe"
+**Diagnóstico paso a paso:**
+
+1. **Ejecutar diagnóstico completo:**
+   ```bash
+   python diagnostico_simple.py
    ```
 
-2. Verificar que todos usan:
+2. **Verificar firewall (PRINCIPAL):**
+   ```bash
+   python verificar_firewall.py
+   ```
+
+   Si muestra "Firewall activo: SI" y "Regla para puerto 5007: NO":
+   - Ejecutar el comando de configuración de firewall (ver sección 7)
+
+3. **Probar recepción local:**
+   ```bash
+   python test_local_multicast.py
+   ```
+
+   Si no recibes tus propios mensajes:
+   - El problema es firewall o configuración local
+   - NO es problema de red con compañeros
+
+4. **Verificar ZeroTier broadcast habilitado:**
+   - Ve a https://my.zerotier.com
+   - Selecciona tu red
+   - En "Advanced" → Marca "Enable Broadcast (ff:ff:ff:ff:ff:ff)"
+
+5. **Verificar que todos usan:**
    - Mismo MULTICAST_GROUP (224.1.1.1)
    - Mismo PORT (5007)
-   - IPs de ZeroTier en LOCAL_IP
+   - IPs de ZeroTier en LOCAL_IP (10.184.53.x o 192.168.194.x)
 
 ### PROBLEMA: "Address already in use"
 **Solución:**

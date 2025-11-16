@@ -49,3 +49,9 @@ capturas/
 
 # Pytest cache
 .pytest_cache/
+
+# Archivos personales/temporales
+INFO_ZEROTIER.txt
+
+# Backups de configuración
+config_backup_*.py
